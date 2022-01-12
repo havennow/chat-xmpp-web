@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+  xmpp-server:
+    image: ejabberd/ecs
+    container_name: xmpp-server
+    volumes:
+      - './ejabberd.yml:/home/ejabberd/conf/ejabberd.yml'
+    restart: always
+    ports:
+      - 5443:5443
+      - 5280:5280
+
+  xmpp-web:
+    image: nioc/xmpp-web:latest
+    ports:
+      - "80:80"
+    volumes:
+      - './default.conf:/etc/nginx/conf.d/default.conf'
+    environment:
+      - XMPP_HTTP=http://192.168.15.25:5443/bosh
+      - XMPP_WS=http://192.168.15.25:5443/ws
+      - APP_DEFAULT_DOMAIN=localhost
+    extra_hosts:
+      - "localhost.dev:host-gateway"
